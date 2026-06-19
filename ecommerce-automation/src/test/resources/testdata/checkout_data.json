@@ -1,0 +1,26 @@
+[
+  {
+    "firstName": "Nguyen",
+    "lastName": "Van A",
+    "zipCode": "70000",
+    "scenario": "valid_checkout"
+  },
+  {
+    "firstName": "",
+    "lastName": "Van B",
+    "zipCode": "70000",
+    "scenario": "empty_firstname"
+  },
+  {
+    "firstName": "Tran",
+    "lastName": "",
+    "zipCode": "70000",
+    "scenario": "empty_lastname"
+  },
+  {
+    "firstName": "Le",
+    "lastName": "Van C",
+    "zipCode": "",
+    "scenario": "empty_zip"
+  }
+]

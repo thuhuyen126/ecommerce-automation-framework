@@ -1,0 +1,32 @@
+[
+  {
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "expectedResult": "success",
+    "description": "Valid login"
+  },
+  {
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "expectedResult": "locked",
+    "description": "Locked account"
+  },
+  {
+    "username": "",
+    "password": "secret_sauce",
+    "expectedResult": "empty_username",
+    "description": "Empty username"
+  },
+  {
+    "username": "standard_user",
+    "password": "",
+    "expectedResult": "empty_password",
+    "description": "Empty password"
+  },
+  {
+    "username": "invalid_user",
+    "password": "wrong_pass",
+    "expectedResult": "invalid",
+    "description": "Invalid credentials"
+  }
+]
