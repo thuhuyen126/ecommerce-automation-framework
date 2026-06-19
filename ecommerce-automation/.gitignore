@@ -1,20 +1,48 @@
+# =========================
 # Maven
+# =========================
 target/
 *.class
 
-# Reports & Screenshots (generated at runtime)
+# =========================
+# Reports & Screenshots
+# =========================
 reports/
 screenshots/
 
-# IDE
-.idea/
-*.iml
-.vscode/
-*.DS_Store
-
+# =========================
 # Logs
+# =========================
+logs/
 *.log
 
-# Environment-specific (never commit secrets)
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+
+# =========================
+# Eclipse
+# =========================
+.project
+.classpath
+.settings/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
 src/test/resources/config-prod.properties
 src/test/resources/config-uat.properties
