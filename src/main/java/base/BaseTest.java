@@ -170,43 +170,43 @@ public class BaseTest {
     // ─────────────────────────────────────────
 
     private WebDriver createChromeDriver(
-            boolean headless) {
+        boolean headless) {
 
         WebDriverManager.chromedriver().setup();
 
-        ChromeOptions options =
-                new ChromeOptions();
+        ChromeOptions options = new ChromeOptions();
 
         setupCommonChromeOptions(options);
 
-        if (headless) {
+        /*
+        * GitHub Actions (Linux) requires headless mode.
+        */
+        if (headless || System.getenv("GITHUB_ACTIONS") != null) {
 
-            options.addArguments(
-                    "--headless=new",
-                    "--window-size=1920,1080");
+                options.addArguments(
+                        "--headless=new",
+                        "--window-size=1920,1080");
         }
 
         return new ChromeDriver(options);
     }
 
     private void setupCommonChromeOptions(
-            ChromeOptions options) {
+        ChromeOptions options) {
 
-        options.setPageLoadStrategy(
-                PageLoadStrategy.NORMAL);
+    options.setPageLoadStrategy(
+            PageLoadStrategy.NORMAL);
 
-        options.addArguments(
-                "--disable-notifications",
-                "--disable-popup-blocking",
-                "--disable-infobars",
-                "--disable-extensions",
-                "--remote-allow-origins=*",
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--incognito",
-                "--start-maximized");
+    options.addArguments(
+            "--disable-notifications",
+            "--disable-popup-blocking",
+            "--disable-infobars",
+            "--disable-extensions",
+            "--remote-allow-origins=*",
+            "--no-sandbox",
+            "--disable-dev-shm-usage");
 
-        options.setAcceptInsecureCerts(true);
+    options.setAcceptInsecureCerts(true);
     }
 
     // ─────────────────────────────────────────
@@ -267,9 +267,12 @@ public class BaseTest {
     // ─────────────────────────────────────────
 
     private void configureDriver(
-            WebDriver driver) {
+        WebDriver driver) {
 
-        driver.manage().window().maximize();
+        if (System.getenv("GITHUB_ACTIONS") == null) {
+
+                driver.manage().window().maximize();
+        }
 
         driver.manage().timeouts()
                 .implicitlyWait(
