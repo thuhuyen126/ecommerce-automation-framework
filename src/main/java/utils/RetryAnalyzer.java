@@ -17,7 +17,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     @Override
     public boolean retry(ITestResult result) {
 
-        if (retryCount < MAX_RETRY_COUNT) {
+        if (retryCount < MAX_RETRY) {
 
             retryCount++;
 
@@ -25,7 +25,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
                     "Retrying test '{}' ({}/{})",
                     result.getMethod().getMethodName(),
                     retryCount,
-                    MAX_RETRY_COUNT);
+                    MAX_RETRY);
 
             return true;
         }
