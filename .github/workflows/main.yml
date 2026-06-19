@@ -31,4 +31,4 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 
       - name: Run tests
-        run: mvn clean test
+        run: mvn clean test -Dheadless=true
