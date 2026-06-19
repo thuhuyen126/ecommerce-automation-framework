@@ -6,15 +6,18 @@ import org.testng.annotations.ITestAnnotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-/**
- * RetryListener - Applies RetryAnalyzer to ALL tests automatically.
- * Register in testng.xml instead of adding retryAnalyzer to each @Test.
- */
 public class RetryListener implements IAnnotationTransformer {
 
     @Override
-    public void transform(ITestAnnotation annotation, Class testClass,
-                          Constructor testConstructor, Method testMethod) {
-        annotation.setRetryAnalyzer(RetryAnalyzer.class);
+    public void transform(
+            ITestAnnotation annotation,
+            Class testClass,
+            Constructor testConstructor,
+            Method testMethod) {
+
+        if (annotation.getRetryAnalyzerClass() == null) {
+
+            annotation.setRetryAnalyzer(RetryAnalyzer.class);
+        }
     }
 }

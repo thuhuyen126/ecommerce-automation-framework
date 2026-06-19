@@ -18,79 +18,198 @@ import java.io.File;
  */
 public class ExtentReportListener implements ITestListener, ISuiteListener {
 
-    private static final Logger log = LogManager.getLogger(ExtentReportListener.class);
-    private static ExtentReports extent;
-    private static final ThreadLocal<ExtentTest> testThread = new ThreadLocal<>();
+    private static final Logger log =
+            LogManager.getLogger(ExtentReportListener.class);
 
-    // ── Suite-level ───────────────────────────────────────────
+    private static ExtentReports extent;
+
+    private static final ThreadLocal<ExtentTest> testThread =
+            new ThreadLocal<>();
+
+
+    // ─────────────────────────────────────────
+    // Suite-level
+    // ─────────────────────────────────────────
 
     @Override
     public void onStart(ISuite suite) {
-        String reportPath = ConfigReader.getReportPath() + "extent-report.html";
+
+        String reportPath =
+                ConfigReader.getReportPath() + "extent-report.html";
 
         // Create reports directory if missing
         new File(ConfigReader.getReportPath()).mkdirs();
 
-        ExtentSparkReporter spark = new ExtentSparkReporter(reportPath);
-        spark.config().setDocumentTitle("E-Commerce Automation Report");
-        spark.config().setReportName(ConfigReader.get("report.name"));
-        spark.config().setTheme(Theme.STANDARD);
-        spark.config().setEncoding("UTF-8");
+        ExtentSparkReporter spark =
+                new ExtentSparkReporter(reportPath);
+
+        spark.config()
+                .setDocumentTitle(
+                        "E-Commerce Automation Report");
+
+        spark.config()
+                .setReportName(
+                        ConfigReader.get("report.name"));
+
+        spark.config()
+                .setTheme(
+                        Theme.STANDARD);
+
+        spark.config()
+                .setEncoding(
+                        "UTF-8");
 
         extent = new ExtentReports();
-        extent.attachReporter(spark);
-        extent.setSystemInfo("Project",     "E-Commerce Automation");
-        extent.setSystemInfo("Tester",      "QA Team");
-        extent.setSystemInfo("Environment", ConfigReader.getEnv().toUpperCase());
-        extent.setSystemInfo("Browser",     ConfigReader.getBrowser());
-        extent.setSystemInfo("Base URL",    ConfigReader.getBaseUrl());
 
-        log.info("Extent Report initialized at: {}", reportPath);
+        extent.attachReporter(spark);
+
+        extent.setSystemInfo(
+                "Project",
+                "E-Commerce Automation");
+
+        extent.setSystemInfo(
+                "Tester",
+                "QA Team");
+
+        extent.setSystemInfo(
+                "Environment",
+                ConfigReader.getEnv().toUpperCase());
+
+        extent.setSystemInfo(
+                "Browser",
+                ConfigReader.getBrowser());
+
+        extent.setSystemInfo(
+                "Base URL",
+                ConfigReader.getBaseUrl());
+
+        log.info(
+                "Extent Report initialized at: {}",
+                reportPath);
     }
 
     @Override
     public void onFinish(ISuite suite) {
+
         if (extent != null) {
+
             extent.flush();
-            log.info("Extent Report saved.");
+
+            log.info(
+                    "Extent Report saved.");
         }
     }
 
-    // ── Test-level ────────────────────────────────────────────
+
+    // ─────────────────────────────────────────
+    // Test-level
+    // ─────────────────────────────────────────
 
     @Override
     public void onTestStart(ITestResult result) {
-        String testName = result.getMethod().getMethodName();
-        String description = result.getMethod().getDescription();
 
-        ExtentTest test = extent.createTest(testName,
-            (description != null && !description.isEmpty()) ? description : testName);
+        String testName =
+                result.getMethod().getMethodName();
+
+        String description =
+                result.getMethod().getDescription();
+
+        ExtentTest test =
+                extent.createTest(
+                        testName,
+                        (description != null
+                                && !description.isEmpty())
+                                ? description
+                                : testName);
+
         testThread.set(test);
-        log.info("Starting test: {}", testName);
+
+        log.info(
+                "Starting test: {}",
+                testName);
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        getTest().log(Status.PASS, "Test PASSED ✓");
+
+        if (getTest() != null) {
+
+            getTest().log(
+                    Status.PASS,
+                    "Test PASSED ✓");
+        }
+
+        testThread.remove();
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        getTest().log(Status.FAIL, "Test FAILED ✗");
-        getTest().log(Status.FAIL, result.getThrowable());
+
+        if (getTest() != null) {
+
+            getTest().log(
+                    Status.FAIL,
+                    "Test FAILED ✗");
+
+            getTest().log(
+                    Status.FAIL,
+                    result.getThrowable());
+        }
+
+        testThread.remove();
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        getTest().log(Status.SKIP, "Test SKIPPED");
-        if (result.getThrowable() != null) {
-            getTest().log(Status.SKIP, result.getThrowable());
+
+        if (getTest() != null) {
+
+            getTest().log(
+                    Status.SKIP,
+                    "Test SKIPPED");
+
+            if (result.getThrowable() != null) {
+
+                getTest().log(
+                        Status.SKIP,
+                        result.getThrowable());
+            }
         }
+
+        testThread.remove();
     }
 
-    // ── Utilities ─────────────────────────────────────────────
+
+    // ─────────────────────────────────────────
+    // Optional methods
+    // ─────────────────────────────────────────
+
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(
+            ITestResult result) {
+
+    }
+
+    @Override
+    public void onStart(
+            ITestContext context) {
+
+    }
+
+    @Override
+    public void onFinish(
+            ITestContext context) {
+
+        testThread.remove();
+    }
+
+
+    // ─────────────────────────────────────────
+    // Utilities
+    // ─────────────────────────────────────────
 
     public static ExtentTest getTest() {
+
         return testThread.get();
     }
 
@@ -98,12 +217,23 @@ public class ExtentReportListener implements ITestListener, ISuiteListener {
      * Attaches a screenshot to the current test in the Extent Report.
      * Called from BaseTest.tearDown() on failure.
      */
-    public static void attachScreenshot(String screenshotPath) {
-        if (screenshotPath != null && getTest() != null) {
+    public static void attachScreenshot(
+            String screenshotPath) {
+
+        if (screenshotPath != null
+                && getTest() != null) {
+
             try {
-                getTest().addScreenCaptureFromPath(screenshotPath, "Failure Screenshot");
+
+                getTest().addScreenCaptureFromPath(
+                        screenshotPath,
+                        "Failure Screenshot");
+
             } catch (Exception e) {
-                log.warn("Could not attach screenshot to report: {}", e.getMessage());
+
+                log.warn(
+                        "Could not attach screenshot to report: {}",
+                        e.getMessage());
             }
         }
     }

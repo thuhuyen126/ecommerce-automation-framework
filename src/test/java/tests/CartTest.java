@@ -44,6 +44,10 @@ public class CartTest extends BaseTest {
         // Reset application state safely
         productsPage.resetAppState();
 
+        Assert.assertTrue(
+        productsPage.isPageLoaded(),
+        "Products page should be ready after reset");
+
         // Verify cart starts empty
         Assert.assertEquals(
                 productsPage.getCartCount(),

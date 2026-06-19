@@ -92,9 +92,12 @@ public class BaseTest {
                 "======================================");
 
         WebDriver driver =
-                createDriver(browserToUse);
+        createDriver(browserToUse);
 
-        configureDriver(driver);
+configureDriver(driver);
+
+// Clear cookies before every test
+driver.manage().deleteAllCookies();
 
         WebDriverWait wait =
                 new WebDriverWait(
@@ -145,51 +148,65 @@ public class BaseTest {
 
     private WebDriver createDriver(String browser) {
 
-        boolean headless =
-                ConfigReader.isHeadless();
+    boolean headless = ConfigReader.isHeadless();
 
-        log.info("Headless mode: {}", headless);
-
-        return switch (browser) {
-
-            case "chrome" -> createChromeDriver(headless);
-
-            case "edge" -> createEdgeDriver(headless);
-
-            case "firefox" -> createFirefoxDriver(headless);
-
-            default -> throw new IllegalArgumentException(
-                    "Unsupported browser: "
-                            + browser
-                            + " | Supported: chrome | edge | firefox");
-        };
+    // Nếu chạy trên GitHub Actions thì bắt buộc headless
+    if (System.getenv("GITHUB_ACTIONS") != null) {
+        headless = true;
     }
+
+    log.info("Headless mode: {}", headless);
+
+    return switch (browser) {
+
+        case "chrome" -> createChromeDriver(headless);
+
+        case "edge" -> createEdgeDriver(headless);
+
+        case "firefox" -> createFirefoxDriver(headless);
+
+        default -> throw new IllegalArgumentException(
+                "Unsupported browser: "
+                        + browser
+                        + " | Supported: chrome | edge | firefox");
+    };
+}
 
     // ─────────────────────────────────────────
     // Chrome
     // ─────────────────────────────────────────
 
-    private WebDriver createChromeDriver(
-        boolean headless) {
+    private WebDriver createChromeDriver(boolean headless) {
 
-        WebDriverManager.chromedriver().setup();
+    WebDriverManager.chromedriver().setup();
 
-        ChromeOptions options = new ChromeOptions();
+    ChromeOptions options = new ChromeOptions();
 
-        setupCommonChromeOptions(options);
+    options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
 
-        /*
-        * GitHub Actions (Linux) requires headless mode.
-        */
-        if (headless || System.getenv("GITHUB_ACTIONS") != null) {
+    options.addArguments(
+            "--disable-notifications",
+            "--disable-popup-blocking",
+            "--disable-infobars",
+            "--disable-extensions",
+            "--remote-allow-origins=*",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--window-size=1920,1080"
+    );
 
-                options.addArguments(
-                        "--headless=new",
-                        "--window-size=1920,1080");
-        }
+    if (headless) {
 
-        return new ChromeDriver(options);
+        options.addArguments(
+                "--headless=new"
+        );
     }
+
+    options.setAcceptInsecureCerts(true);
+
+    return new ChromeDriver(options);
+}
 
     private void setupCommonChromeOptions(
         ChromeOptions options) {
@@ -204,10 +221,12 @@ public class BaseTest {
             "--disable-extensions",
             "--remote-allow-origins=*",
             "--no-sandbox",
-            "--disable-dev-shm-usage");
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--window-size=1920,1080");
 
     options.setAcceptInsecureCerts(true);
-    }
+}
 
     // ─────────────────────────────────────────
     // Edge
@@ -269,25 +288,20 @@ public class BaseTest {
     private void configureDriver(
         WebDriver driver) {
 
-        if (System.getenv("GITHUB_ACTIONS") == null) {
+    driver.manage().timeouts()
+            .implicitlyWait(
+                    Duration.ofSeconds(
+                            ConfigReader.getImplicitWait()));
 
-                driver.manage().window().maximize();
-        }
+    driver.manage().timeouts()
+            .pageLoadTimeout(
+                    Duration.ofSeconds(
+                            ConfigReader.getPageLoadTimeout()));
 
-        driver.manage().timeouts()
-                .implicitlyWait(
-                        Duration.ofSeconds(
-                                ConfigReader.getImplicitWait()));
-
-        driver.manage().timeouts()
-                .pageLoadTimeout(
-                        Duration.ofSeconds(
-                                ConfigReader.getPageLoadTimeout()));
-
-        driver.manage().timeouts()
-                .scriptTimeout(
-                        Duration.ofSeconds(30));
-    }
+    driver.manage().timeouts()
+            .scriptTimeout(
+                    Duration.ofSeconds(30));
+}
 
     // ─────────────────────────────────────────
     // Navigation

@@ -102,24 +102,34 @@ public class ProductsPage {
      */
     public void addProductToCartByName(String productName) {
 
-        String slug = productName
-                .toLowerCase()
-                .replace(" ", "-");
+    String slug = productName
+            .toLowerCase()
+            .replace(" ", "-");
 
-        String buttonId = "add-to-cart-" + slug;
+    String addButtonId = "add-to-cart-" + slug;
 
-        log.info("Adding product to cart: {}", productName);
+    log.info("Adding product: {}", productName);
 
-        WebElement addButton = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        By.id(buttonId)));
+    WebElement addButton = wait.until(
+            ExpectedConditions.elementToBeClickable(
+                    By.id(addButtonId)));
 
-        addButton.click();
+    addButton.click();
 
-        // Wait button changes to Remove
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.id("remove-" + slug)));
-    }
+    String removeButtonId = "remove-" + slug;
+
+    wait.until(
+            ExpectedConditions.presenceOfElementLocated(
+                    By.id(removeButtonId)));
+
+    wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                    By.id(removeButtonId)));
+
+    wait.until(
+            ExpectedConditions.elementToBeClickable(
+                    By.id(removeButtonId)));
+}
 
     /**
      * Remove product from inventory page.
@@ -273,45 +283,61 @@ public class ProductsPage {
     }
 
     /**
-     * Logout from application.
-     */
-    public void logout() {
+ * Logout from application.
+ */
+public void logout() {
 
-        log.info("Logging out");
+    log.info("Logging out");
 
-        openMenu();
+    openMenu();
 
-        WebElement logoutBtn = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        By.id("logout_sidebar_link")));
+    WebElement logoutBtn = wait.until(
+            ExpectedConditions.elementToBeClickable(
+                    By.id("logout_sidebar_link")));
 
-        logoutBtn.click();
+    logoutBtn.click();
 
-        // Wait login page loaded
-        wait.until(ExpectedConditions.urlContains("saucedemo"));
+    // Wait login page loaded completely
+    wait.until(
+            ExpectedConditions.urlContains(
+                    "saucedemo"));
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.id("login-button")));
-    }
+    wait.until(
+            ExpectedConditions.presenceOfElementLocated(
+                    By.id("login-button")));
+
+    wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                    By.id("login-button")));
+
+    wait.until(
+            ExpectedConditions.elementToBeClickable(
+                    By.id("login-button")));
+
+    log.info("Logout successful");
+}
 
     /**
      * Reset application/cart state.
      */
     public void resetAppState() {
 
-        log.info("Resetting application state");
+    log.info("Resetting application state");
 
-        openMenu();
+    openMenu();
 
-        WebElement resetBtn = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        By.id("reset_sidebar_link")));
+    WebElement resetBtn = wait.until(
+            ExpectedConditions.elementToBeClickable(
+                    By.id("reset_sidebar_link")));
 
-        resetBtn.click();
+    resetBtn.click();
 
-        // Wait inventory page stable again
-        wait.until(ExpectedConditions.visibilityOf(pageTitle));
+    wait.until(
+            ExpectedConditions.visibilityOf(pageTitle));
 
-        closeMenu();
-    }
+    wait.until(
+            ExpectedConditions.elementToBeClickable(cartLink));
+
+    closeMenu();
+}
 }

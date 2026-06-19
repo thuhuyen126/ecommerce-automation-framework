@@ -152,9 +152,14 @@ public class CartPage {
 
         removeButton.click();
 
-        // Wait item removed from DOM
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+wait.until(
+        ExpectedConditions.invisibilityOfElementLocated(
                 By.id(removeButtonId)));
+
+wait.until(driver ->
+        driver.findElements(
+                By.id(removeButtonId))
+                .isEmpty());
     }
 
     /**
@@ -180,16 +185,20 @@ public class CartPage {
      */
     public ProductsPage continueShopping() {
 
-        log.info("Continuing shopping");
+    log.info("Continuing shopping");
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        continueShoppingButton))
-                .click();
+    wait.until(
+            ExpectedConditions.elementToBeClickable(
+                    continueShoppingButton))
+            .click();
 
-        wait.until(
-                ExpectedConditions.urlContains("inventory"));
+    wait.until(
+        ExpectedConditions.urlContains("inventory"));
 
-        return new ProductsPage(driver);
-    }
+wait.until(
+        ExpectedConditions.visibilityOfElementLocated(
+                By.className("title")));
+
+return new ProductsPage(driver);
+}
 }
